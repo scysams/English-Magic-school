@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故事山丘</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- 關卡專屬樣式 --- */
+        #exercise-area { min-height: 400px; text-align: center; }
+        h1, h2, h3, p, .wood-button { font-family: 'Nunito', sans-serif; }
+        h1 { font-weight: 900; } h3 { font-weight: 700; } p { font-weight: 400; }
+
+        /* --- P.1 專屬樣式 --- */
+        #p1-story-board {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            background: #fff8e1;
+            border: 3px dashed #8B4513;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .story-slot {
+            width: 30%;
+            height: 180px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #dcdcdc;
+            font-weight: 900;
+            transition: background-color 0.2s;
+        }
+        .story-slot.drag-over {
+            background-color: #c8e6c9;
+            border-style: solid;
+        }
+        #p1-image-bank {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            min-height: 150px;
+            border-top: 2px solid #8B4513;
+            padding-top: 20px;
+        }
+        .story-image-card {
+            width: 140px;
+            height: 140px;
+            cursor: grab;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .story-image-card:hover {
+            transform: scale(1.05);
+        }
+        /* --- P.2 / P.4 / P.5 新增樣式 --- */
+.story-paragraph { text-align: left; background: white; padding: 20px; border-radius: 5px; font-size: 22px; line-height: 1.7; margin: 20px 0; }
+.tf-buttons, .mc-options { margin-top: 20px; }
+
+    </style>
+</head>
+<body>
+    <div class="content-box game-layout">
+        <div><h1 id="level-title"></h1><p id="level-description"></p></div>
+        <div id="exercise-area" class="game-exercise-area"></div>
+        <div id="button-container" class="game-button-container">
+            <button id="complete-chapter-btn" class="wood-button" style="display:none; background-color: #4CAF50;">完成「故事山丘」挑戰！</button>
+            <button id="reset-chapter-btn" class="wood-button" style="background-color: #c76a5a;">重置本章進度</button>
+            <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7;">返回主題地圖</a>
+        </div>
+    </div>
+    <script>
+        // === 1. 獲取核心元素和當前年級 ===
+        const currentGrade = parseInt(localStorage.getItem('selectedGrade') || '1');
+        const exerciseArea = document.getElementById('exercise-area');
+        const completeBtn = document.getElementById('complete-chapter-btn');
+        const levelTitle = document.getElementById('level-title');
+        const levelDescription = document.getElementById('level-description');
+        const resetChapterBtn = document.getElementById('reset-chapter-btn');
+
+        // === 2. 「畢業」與「完成」函數 ===
+        function checkGraduation() { const key = `hill_p${currentGrade}_completed`; if (localStorage.getItem(key) === 'true') { completeBtn.style.display = 'inline-block'; } }
+        function completeChapter() { localStorage.setItem('hillCompleted', 'true'); alert("恭喜！你已徹底征服故事山丘！"); window.location.href = 'main_menu.html'; }
+        
+        // === 3. 題庫 ===
+        const gradeContent = {
+            1: {
+                title: "P.1 - 看圖說故事",
+                description: "請將圖片，按照故事發生的順序，拖曳到上方的 1, 2, 3 框格裡。",
+                setup: function() {
+                    const key = 'hill_p1_completed';
+                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+                    
+                    exerciseArea.innerHTML = `
+                        <div id="p1-story-board">
+                            <div class="story-slot" data-order="1">1</div>
+                            <div class="story-slot" data-order="2">2</div>
+                            <div class="story-slot" data-order="3">3</div>
+                        </div>
+                        <div id="p1-image-bank"></div>
+                        <button id="check-btn" class="wood-button" style="margin-top: 20px;">檢查順序</button>
+                    `;
+
+                    const images = [ { src: 'wakeup.png', order: 1 }, { src: 'eat.png', order: 2 }, { src: 'gotoschool.png', order: 3 } ];
+                    const imageBank = document.getElementById('p1-image-bank');
+                    images.sort(() => Math.random() - 0.5).forEach(imgData => {
+                        const img = document.createElement('img');
+                        img.src = imgData.src; img.className = 'story-image-card'; img.draggable = true;
+                        img.dataset.order = imgData.order;
+                        imageBank.appendChild(img);
+                    });
+
+                    let draggedItem = null;
+                    document.querySelectorAll('.story-image-card, .story-slot').forEach(item => {
+                        item.addEventListener('dragstart', (e) => {
+                            // 如果是從格子里拖出來，就記住它
+                            if (e.target.classList.contains('story-image-card')) {
+                                draggedItem = e.target;
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll('.story-slot').forEach(slot => {
+                        slot.addEventListener('dragover', e => e.preventDefault());
+                        slot.addEventListener('dragenter', () => slot.classList.add('drag-over'));
+                        slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+                        slot.addEventListener('drop', (e) => {
+                            e.preventDefault();
+                            slot.classList.remove('drag-over');
+                            if (draggedItem) {
+                                // 如果格子裡已有圖片，把它跟拖曳的圖片交換位置
+                                if (slot.children.length > 0) {
+                                    const existingCard = slot.children[0];
+                                    draggedItem.parentElement.appendChild(existingCard);
+                                }
+                                slot.appendChild(draggedItem);
+                                draggedItem = null;
+                            }
+                        });
+                    });
+
+                    document.getElementById('check-btn').onclick = () => {
+                        const slots = document.querySelectorAll('.story-slot');
+                        const isCorrect = Array.from(slots).every((slot, index) => {
+                            return slot.children.length === 1 && slot.children[0].dataset.order == (index + 1);
+                        });
+                        if (isCorrect) {
+                            alert('順序完全正確！你太棒了！');
+                            localStorage.setItem(key, 'true');
+                            checkGraduation();
+                        } else {
+                            alert('順序好像不太對哦，再想想看！');
+                        }
+                    };
+                }
+            },
+            2: {
+    title: "P.2 - 時鐘偵探 (True or False)",
+    description: "請觀察圖片和時間，判斷句子是否正確。",
+    setup: function() {
+        const key = 'hill_p2_completed';
+        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+
+        const questions = [
+            { time: "9:00 AM", scene: "上課 🧑‍🏫", statement: "At 9:00 AM, the students are sleeping.", answer: false },
+            { time: "12:30 PM", scene: "午飯 🍱", statement: "At 12:30 PM, the students are having lunch.", answer: true },
+            { time: "8:00 PM", scene: "做功課 ✍️", statement: "At 8:00 PM, the students are playing in the park.", answer: false }
+        ];
+        let idx = 0;
+
+        function display() {
+            if (idx >= questions.length) {
+                alert("太棒了！P.2 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+            }
+            const q = questions[idx];
+            exerciseArea.innerHTML = `
+                <div style="font-size: 60px; font-weight: 900;">${q.time} 🕒</div>
+                <div style="font-size: 80px;">${q.scene}</div>
+                <h3 style="margin-top: 30px;">${q.statement}</h3>
+                <div class="tf-buttons">
+                    <button id="true-btn" class="wood-button" style="background-color: #4CAF50;">True ✔️</button>
+                    <button id="false-btn" class="wood-button" style="background-color: #f44336;">False ❌</button>
+                </div>
+            `;
+            document.getElementById('true-btn').onclick = () => checkAnswer(true);
+            document.getElementById('false-btn').onclick = () => checkAnswer(false);
+        }
+
+        function checkAnswer(userAnswer) {
+            const q = questions[idx];
+            if (userAnswer === q.answer) {
+                idx++; display();
+            } else {
+                alert("不對哦，再仔細想一想！");
+            }
+        }
+        display();
+    }
+},
+        3: {
+    title: "P.3 - 時間線索 (Multiple Choice)",
+    description: "請閱讀段落，然後回答關於順序的問題。",
+    setup: function() {
+        const key = 'hill_p3_completed';
+        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
+        
+        const stories = [
+            {
+                paragraph: "To make a sandwich, **first**, you take two slices of bread. **Then**, you put some cheese on one slice. **Finally**, you put the other slice on top.",
+                question: "Which action happened first?",
+                options: ["Put cheese", "Take bread", "Put slices on top"],
+                answer: "Take bread"
+            },
+            {
+                paragraph: "Yesterday was a busy day. **First**, I went to the library. **After that**, I played football with my friends. **In the evening**, I did my homework.",
+                question: "What did I do after going to the library?",
+                options: ["Did homework", "Ate dinner", "Played football"],
+                answer: "Played football"
+            }
+        ];
+        let idx = 0;
+
+        function display() {
+            if (idx >= stories.length) {
+                alert("邏輯滿分！P.3 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+            }
+            const s = stories[idx];
+            exerciseArea.innerHTML = `
+                <div class="story-paragraph">${s.paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+                <h3 style="margin-top: 30px;">${s.question}</h3>
+                <div class="mc-options"></div>
+            `;
+            const optionsContainer = document.querySelector('.mc-options');
+            s.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'wood-button'; btn.textContent = opt;
+                btn.onclick = () => {
+                    if (opt === s.answer) {
+                        idx++; display();
+                    } else {
+                        btn.classList.add('shake-wrong');
+                        setTimeout(() => btn.classList.remove('shake-wrong'), 500);
+                    }
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+        display();
+    }
+},
+        4: {
+    title: "P.4 - 小偵探 (是非題)",
+    description: "請閱讀下面的小故事，然後判斷句子的對錯。",
+    setup: function() {
+        const key = 'hill_p4_completed';
+        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
+        exerciseArea.innerHTML = `
+            <div style="text-align: left; background: white; padding: 15px; border-radius: 5px;">
+                <p>Little Red Riding Hood went to visit her grandma. On her way, she met a big wolf. The wolf ran to grandma's house first.</p>
+            </div>
+            <h3 style="margin-top: 30px;">判斷句子： "Little Red Riding Hood met a cat."</h3>
+            <div style="margin-top: 20px;">
+                <button id="true-btn" class="wood-button" style="background-color: green;">True ✔️</button>
+                <button id="false-btn" class="wood-button" style="background-color: red;">False ❌</button>
+            </div>
+        `;
+        document.getElementById('true-btn').onclick = () => alert("不對哦，她遇到的是大灰狼！");
+        document.getElementById('false-btn').onclick = () => {
+            alert("完全正確！她沒有遇到貓！");
+            localStorage.setItem(key, 'true');
+            checkGraduation();
+        };
+    }
+},
+5: {
+    title: "P.5 - 故事問答 (選擇題)",
+    description: "請閱讀故事，然後回答問題。",
+    setup: function() {
+        const key = 'hill_p5_completed';
+        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
+        exerciseArea.innerHTML = `
+            <div style="text-align: left; background: white; padding: 15px; border-radius: 5px;">
+                <p>Tom is a student. Every morning, he goes to school by bus. After school, he likes to play football in the park with his friends.</p>
+            </div>
+            <h3 style="margin-top: 30px;">Question: Where does Tom like to play football?</h3>
+            <div id="p5-options" style="margin-top: 20px;"></div>
+        `;
+        const options = ["In the school", "In the park", "At home"];
+        const correctAnswer = "In the park";
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'wood-button'; btn.textContent = opt;
+            btn.onclick = () => {
+                if (opt === correctAnswer) {
+                    alert("回答正確！"); localStorage.setItem(key, 'true'); checkGraduation();
+                } else { btn.classList.add('shake-wrong'); setTimeout(() => btn.classList.remove('shake-wrong'), 500); }
+            };
+            document.getElementById('p5-options').appendChild(btn);
+        });
+    }
+},
+6: {
+    title: "P.6 - 尋找核心 (找出主題句)",
+    description: "請點擊最能概括本段大意的句子。",
+    setup: function() {
+        const key = 'hill_p6_completed';
+        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
+        exerciseArea.innerHTML = `
+            <div id="p6-paragraph" style="text-align: left; font-size: 20px; line-height: 1.8;">
+                <span class="sentence" data-correct="false">My dog is very playful.</span>
+                <span class="sentence" data-correct="true">Dogs are wonderful pets for many reasons.</span>
+                <span class="sentence" data-correct="false">They are loyal and always happy to see you.</span>
+                <span class="sentence" data-correct="false">You should take your dog for a walk every day.</span>
+            </div>
+        `;
+        document.querySelectorAll('.sentence').forEach(s => {
+            s.style.cursor = 'pointer';
+            s.onmouseover = () => { s.style.backgroundColor = '#FFD700'; };
+            s.onmouseout = () => { s.style.backgroundColor = 'transparent'; };
+            s.onclick = () => {
+                if (s.dataset.correct === 'true') {
+                    alert("完全正確！這就是主題句！");
+                    localStorage.setItem(key, 'true');
+                    checkGraduation();
+                } else {
+                    alert("不對哦，這只是一個細節或例子。");
+                    s.classList.add('shake-wrong');
+                    setTimeout(() => s.classList.remove('shake-wrong'), 500);
+                }
+            };
+        });
+    }
+}
+        }
+
+        // === 4. 執行與按鈕綁定 ===
+        function run() { const content = gradeContent[currentGrade]; if (content) { levelTitle.textContent = content.title; levelDescription.textContent = content.description; content.setup(); checkGraduation(); } else { exerciseArea.innerHTML = `<h2>P.${currentGrade} 的內容正在建設中...</h2>`; } }
+        completeBtn.addEventListener('click', completeChapter);
+        resetChapterBtn.addEventListener('click', () => { if(confirm("確定重置【故事山丘】的所有進度嗎？")) { for(let i = 1; i <= 6; i++) { localStorage.removeItem(`hill_p${i}_completed`); } localStorage.removeItem('hillCompleted'); alert("故事山丘進度已重置！"); window.location.reload(); } });
+        
+        // === 5. 啟動！ ===
+        run();
+
+    </script>
+</body>
+</html>

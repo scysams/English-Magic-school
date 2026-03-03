@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>句子溪流</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- 關卡專屬樣式 (已修正所有註釋) --- */
+        #exercise-area { min-height: 300px; text-align: center; }
+        h1, h2, h3, p, .word-card, .item-card, .match-card, .wood-button { font-family: 'Nunito', sans-serif; }
+        h1 { font-weight: 900; } h3 { font-weight: 700; font-size: 26px; } p { font-weight: 400; font-size: 18px; }
+        
+        /* --- P.1 / P.2 的卡片樣式 --- */
+        #sentence-box, #word-bank { border: 3px dashed #8B4513; min-height: 80px; margin: 20px auto; padding: 10px; border-radius: 15px; background: #fff8e1; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 90%; }
+        .word-card { 
+            display: inline-flex; align-items: center; padding: 12px 20px;
+            background: #8B4513; color: white; border-radius: 10px; margin: 8px;
+            cursor: pointer; user-select: none; font-size: 22px; font-weight: 700;
+            box-shadow: 0 4px #65320d; transition: all 0.2s;
+        }
+        .word-card:hover { transform: translateY(-2px); }
+        .word-card.selected { background: #FFD700 !important; color: #4a4a4a !important; }
+
+        /* P.3 */
+        #p3-options { margin-top: 30px; } #drop-spot { padding: 5px 40px; border: 3px dashed #8B4513; border-radius: 10px; background: #fff8e1; } #drop-spot.drag-over { background-color: #c8e6c9; }
+        
+        @keyframes shake-wrong { 10%, 90% { transform: translateX(-3px); } 20%, 80% { transform: translateX(3px); } 30%, 50%, 70% { transform: translateX(-5px); } 40%, 60% { transform: translateX(5px); } }
+        .shake-wrong { animation: shake-wrong 0.5s; border-color: red !important; }
+    </style>
+</head>
+<body>
+    <div class="content-box game-layout">
+        <div><h1 id="level-title"></h1><p id="level-description"></p></div>
+        <div id="exercise-area" class="game-exercise-area"></div>
+        <div id="button-container" class="game-button-container">
+            <button id="complete-chapter-btn" class="wood-button" style="display:none; background-color: #4CAF50;">完成「句子溪流」挑戰！</button>
+            <button id="reset-chapter-btn" class="wood-button" style="background-color: #c76a5a;">重置本章進度</button>
+            <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7;">返回主題地圖</a>
+        </div>
+    </div>
+
+    <script>
+        const currentGrade = parseInt(localStorage.getItem('selectedGrade') || '1');
+        const exerciseArea = document.getElementById('exercise-area');
+        const completeBtn = document.getElementById('complete-chapter-btn');
+        const levelTitle = document.getElementById('level-title');
+        const levelDescription = document.getElementById('level-description');
+        const resetChapterBtn = document.getElementById('reset-chapter-btn');
+
+        function checkGraduation() { const key = `stream_p${currentGrade}_completed`; if (localStorage.getItem(key) === 'true') { completeBtn.style.display = 'inline-block'; } }
+        function completeChapter() { localStorage.setItem('streamCompleted', 'true'); alert("恭喜！你已徹底征服句子溪流！"); window.location.href = 'main_menu.html'; }
+
+        // === 【唯一的】題庫定義 ===
+        const gradeContent = {
+            1: {
+                title: "P.1 - Present continuous Tense",
+                description: "請點擊下方的詞語，組成一個完整的句子！",
+                setup: function() {
+                    const key = 'stream_p1_completed';
+                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+                    let sentences = [ { q: "組成句子：『我是一個男孩』", w: ["a boy", "am", "I"], a: "I am a boy" }, { q: "組成句子：『那個男孩正在游泳』", w: ["swimming", "is", "The boy"], a: "The boy is swimming" } ];
+                    let idx = 0;
+                    function display() { if (idx >= sentences.length) { alert("太棒了！P.1 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return; } const s = sentences[idx]; exerciseArea.innerHTML = `<h3>${s.q}</h3><div id="sentence-box"></div><div id="word-bank"></div><button id="check-btn" class="wood-button">檢查</button>`; const sb = document.getElementById('sentence-box'), wb = document.getElementById('word-bank'); s.w.sort(()=>0.5-Math.random()).forEach(w => { const card = document.createElement('div'); card.className='word-card'; card.textContent=w; wb.appendChild(card); }); let selected = null; wb.onclick = e => { if (e.target.classList.contains('word-card')) { if (selected) selected.classList.remove('selected'); selected = e.target; selected.classList.add('selected'); sb.appendChild(e.target); } }; sb.onclick = e => { if (e.target.classList.contains('word-card')) { if (selected) selected.classList.remove('selected'); selected = e.target; selected.classList.add('selected'); wb.appendChild(e.target); } }; document.getElementById('check-btn').onclick = () => { if (Array.from(sb.children).map(c=>c.textContent).join(' ') === s.a) { idx++; display(); } else { alert("順序不對！"); } }; }
+                    display();
+                }
+            },
+            2: {
+                title: "P.2 - Simple Present Tense",
+                description: "組成描述簡單動作的句子。",
+                setup: function() {
+                    // P.2 的邏輯和 P.1 完全一樣，只是題庫不同
+                    const key = 'stream_p2_completed';
+                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+                    const sentences = [ { q: "組成句子：『貓在睡覺』", w: ["sleeps", "The cat"], a: "The cat sleeps" }, { q: "組成句子：『鳥兒在飛』", w: ["fly", "Birds"], a: "Birds fly" } ];
+                    let idx = 0;
+                    function display() { if (idx >= sentences.length) { alert("太棒了！P.2 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return; } const s = sentences[idx]; exerciseArea.innerHTML = `<h3>${s.q}</h3><div id="sentence-box"></div><div id="word-bank"></div><button id="check-btn" class="wood-button">檢查</button>`; const sb = document.getElementById('sentence-box'), wb = document.getElementById('word-bank'); s.w.sort(()=>0.5-Math.random()).forEach(w => { const card = document.createElement('div'); card.className='word-card'; card.textContent=w; wb.appendChild(card); }); let selected = null; wb.onclick = e => { if (e.target.classList.contains('word-card')) { if (selected) selected.classList.remove('selected'); selected = e.target; selected.classList.add('selected'); sb.appendChild(e.target); } }; sb.onclick = e => { if (e.target.classList.contains('word-card')) { if (selected) selected.classList.remove('selected'); selected = e.target; selected.classList.add('selected'); wb.appendChild(e.target); } }; document.getElementById('check-btn').onclick = () => { if (Array.from(sb.children).map(c=>c.textContent).join(' ') === s.a) { idx++; display(); } else { alert("順序不對！"); } }; }
+                    display();
+                }
+            },
+            // 在 const gradeContent = { ... } 內部，替換 "3: { ... },"
+3: {
+    title: "P.3 - Past Tense",
+    description: "Please choose the correct form of word and drag it to the blank space of the sentence.",
+    setup: function() {
+        const key = 'stream_p3_completed';
+        if (localStorage.getItem(key) === 'true') {
+            exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>";
+            checkGraduation(); return;
+        }
+
+        const questions = [
+            { sentence: "He ___ to school yesterday.", options: ["go", "went", "goes"], answer: "went" },
+            { sentence: "She ___ an apple this morning.", options: ["eat", "eats", "ate"], answer: "ate" },
+            { sentence: "They ___ a movie last night.", options: ["see", "saw", "seen"], answer: "saw" }
+        ];
+        let currentQuestionIndex = 0;
+        let draggedItem = null; // 提升到 setup 的頂層作用域
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                exerciseArea.innerHTML = "<h2>太棒了！你掌握了過去式！</h2>";
+                localStorage.setItem(key, 'true');
+                checkGraduation(); return;
+            }
+            const q = questions[currentQuestionIndex];
+            
+            exerciseArea.innerHTML = `
+                <h3 style="font-size: 28px; font-family: 'Nunito', sans-serif;">${q.sentence.replace('___', '<span id="drop-spot" class="drop-zone" style="background: #fff8e1; border-style:dashed;">___</span>')}</h3>
+                <div id="p3-options" style="margin-top: 30px;"></div>
+            `;
+            
+            const optionsContainer = document.getElementById('p3-options');
+            q.options.sort(() => Math.random() - 0.5).forEach(opt => {
+                const card = document.createElement('div');
+                card.className = 'item-card'; card.textContent = opt; card.draggable = true;
+                optionsContainer.appendChild(card);
+            });
+
+            // 【核心】我們不再定義一個單獨的 bindEvents 函數
+            // 而是直接在這裡，為「剛剛創建」的元素綁定事件
+            
+            // 只在 exerciseArea 內部尋找 .item-card！
+            exerciseArea.querySelectorAll('.item-card').forEach(card => {
+                card.addEventListener('dragstart', function(){ draggedItem = this; });
+            });
+            
+            const dropSpot = document.getElementById('drop-spot');
+            if (dropSpot) { // 確保 dropSpot 存在
+                dropSpot.addEventListener('dragover', e => e.preventDefault());
+                dropSpot.addEventListener('drop', function() {
+                    if (draggedItem) {
+                        if (draggedItem.textContent === q.answer) {
+                            this.textContent = q.answer;
+                            this.style.borderColor = "green";
+                            setTimeout(() => {
+                                currentQuestionIndex++;
+                                displayQuestion();
+                            }, 1000);
+                        } else {
+                            draggedItem.classList.add('shake-wrong');
+                            setTimeout(() => draggedItem.classList.remove('shake-wrong'), 500);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 開始遊戲
+        displayQuestion();
+    }
+},
+
+            4: {
+        title: "P.4 - Future Tense",
+        description: "Please choose the correct word and complete the sentence.",
+        setup: function() {
+            const key = 'stream_p4_completed';
+            if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+            const questions = [
+                { q: "Tomorrow, they ___ play basketball.", opts: ["will", "are", "did"], ans: "will" },
+                { q: "I think it ___ rain later.", opts: ["is going to", "was", "does"], ans: "is going to" }
+            ];
+            let idx = 0;
+            function display() { if (idx >= questions.length) { alert("P.4 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return; } const current = questions[idx]; exerciseArea.innerHTML = `<h3 style="font-size: 28px;">${current.q.replace('___', '<span style="color:red;">___</span>')}</h3><div id="p4-options" style="margin-top: 30px;"></div>`; const container = document.getElementById('p4-options'); current.opts.forEach(opt => { const btn = document.createElement('button'); btn.className = 'wood-button'; btn.textContent = opt; btn.onclick = () => { if (opt === current.ans) { idx++; display(); } else { btn.classList.add('shake-wrong'); setTimeout(() => btn.classList.remove('shake-wrong'), 500); } }; container.appendChild(btn); }); }
+            display();
+        }
+    },
+    5: {
+        title: "P.5 - Present Perfect Tense",
+        description: "用 `have/has` 和動詞的「過去分詞」來造句。",
+        setup: function() {
+            const key = 'stream_p5_completed';
+            if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+            exerciseArea.innerHTML = `<h3 style="font-size: 28px;">She <span style="color:red;">___</span> already <span style="color:red;">___</span> her homework.</h3><p>(動詞: do)</p><button id="check-btn" class="wood-button">has ... done</button>`;
+            document.getElementById('check-btn').onclick = () => { alert('正確！'); localStorage.setItem(key, 'true'); checkGraduation(); };
+        }
+    },
+    6: {
+        title: "P.6 - Passive Voice",
+        description: "將主動句，改寫為被動句。",
+        setup: function() {
+            const key = 'stream_p6_completed';
+            if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+            const questions = [ { active: "The cat ate the fish.", passive: "was" }, { active: "Someone cleans this room every day.", passive: "is" } ];
+            let idx = 0;
+            function display() { if (idx >= questions.length) { alert("P.6 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return; } const q = questions[idx]; exerciseArea.innerHTML = `<p>主動句: ${q.active}</p><h3 style="font-size: 28px;">被動句: The fish <span style="color:red;">___</span> eaten by the cat.</h3><div id="p6-options"></div>`; const opts = ["is", "was", "will be"]; opts.forEach(opt => { const btn = document.createElement('button'); btn.className = 'wood-button'; btn.textContent = opt; btn.onclick = () => { if (opt === q.passive) { idx++; display(); } else { btn.classList.add('shake-wrong'); setTimeout(()=>btn.classList.remove('shake-wrong'),500); } }; document.getElementById('p6-options').appendChild(btn); }); }
+            display();
+        }
+    }
+};
+function bindDragEvents(container1, container2) {
+    let draggedItem = null;
+    const allCards = document.querySelectorAll('.item-card, .word-card');
+    allCards.forEach(card => {
+        card.addEventListener('dragstart', () => { draggedItem = card; setTimeout(() => card.style.display = 'none', 0); });
+        card.addEventListener('dragend', () => { setTimeout(() => { card.style.display = 'inline-block'; draggedItem = null; }, 0); });
+    });
+    [container1, container2].forEach(container => {
+        container.addEventListener('dragover', e => e.preventDefault());
+        container.addEventListener('drop', () => {
+            if (draggedItem) {
+                container.appendChild(draggedItem);
+            }
+        });
+    });
+}
+     // === 唯一的 run 函數 ===
+        function run() { const content = gradeContent[currentGrade]; if (content) { levelTitle.textContent = content.title; levelDescription.textContent = content.description; content.setup(); checkGraduation(); } else { exerciseArea.innerHTML = `<h2>P.${currentGrade} 的內容正在建設中...</h2>`; } }
+        
+        // === 為按鈕綁定事件 ===
+        completeBtn.addEventListener('click', completeChapter);
+        resetChapterBtn.addEventListener('click', () => { if(confirm("確定重置【句子溪流】的所有進度嗎？")) { for(let i = 1; i <= 6; i++) { localStorage.removeItem(`stream_p${i}_completed`); } localStorage.removeItem('streamCompleted'); alert("句子溪流進度已重置！"); window.location.reload(); } });
+
+        // === 唯一的啟動點 ===
+        run();
+    </script>
+    </body>
+    </html>

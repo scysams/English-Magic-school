@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方位迷宮</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="map-container">
+        <h1>歡迎來到方位迷宮！</h1>
+        <p>在(In)、上(On)、下(Under)... 你能否利用介詞，走出這個神秘的迷宮？</p>
+
+        <!-- 這個按鈕的 id 是 'complete-maze-btn' -->
+        <button id="complete-maze-btn" class="wood-button">我已完成此區域的冒險！</button>
+        <button id="reset-stream-progress-btn" class="wood-button" style="background-color: #c76a5a; margin: 30px 10px 0 10px;">重置本章進度</button>
+        <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7; margin-top: 20px;">返回主題地圖</a>
+        <a href="index.html" class="wood-button" style="background-color: #d4e87d; margin-top: 20px;">返回魔法學校大門</a>
+    </div>
+
+    <script>
+        // 選取「完成方位迷宮」的按鈕
+        const completeButton = document.querySelector('#complete-maze-btn');
+
+        completeButton.addEventListener('click', function() {
+            // 【核心咒語】寫下 'mazeCompleted' 的通關標記！
+            localStorage.setItem('mazeCompleted', 'true');
+
+            // 提示玩家，這是當前的最後一關
+            alert("無與倫比！你已成為了空間的大師！你已征服了當前所有的挑戰！");
+
+            // 禁用按鈕
+            this.disabled = true;
+            this.textContent = "已完成！";
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時光之巔</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 確保這個 div 存在，並且它的 class 正是 "content-box" -->
+    <div class="content-box">
+
+        <h1>歡迎來到時光之巔！</h1>
+        
+        <p>在這裡，你將穿越過去、現在與未來，掌握動詞時態的奧秘！</p>
+
+        <button id="complete-summit-btn" class="wood-button">我已完成此區域的冒險！</button>
+       <button id="reset-stream-progress-btn" class="wood-button" style="background-color: #c76a5a; margin: 30px 10px 0 10px;">重置本章進度</button>
+       <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7; margin-top: 20px;">返回主題地圖</a>
+       <a href="index.html" class="wood-button" style="background-color: #d4e87d; margin-top: 20px;">返回魔法學校大門</a>
+    </div>
+    <!-- 確保這個 div 在 script 標籤之前閉合 -->
+
+    <script>
+        const completeButton = document.querySelector('#complete-summit-btn');
+        completeButton.addEventListener('click', function() {
+            localStorage.setItem('summitCompleted', 'true');
+            alert("太厲害了！你已掌控了時間的流動！方位迷宮現在可能已經解鎖了！");
+            this.disabled = true;
+            this.textContent = "已完成！";
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>色彩峽谷</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- 這個關卡專屬的樣式 --- */
+        .canyon-drawing { 
+            width: 90%; 
+            max-width: 500px;
+            height: 300px; 
+            background: #eee; 
+            border: 3px solid #ccc; 
+            margin: 20px auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .canyon-part { 
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background: #f0f0f0;
+            transition: all 1s ease;
+            position: relative; /* 為了文字 */
+            color: #aaa;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #sun { height: 30%; }
+        #river { height: 40%; }
+        #tree { height: 25%; }
+        
+        /* --- 染色後的 Class --- */
+        #sun.colored { background-color: #FFD700; color: white; } /* 金色 */
+        #river.colored { background-color: #1E90FF; color: white; } /* 深藍色 */
+        #tree.colored { background-color: #228B22; color: white; } /* 森林綠 */
+
+        /* --- 互動區域的樣式 --- */
+        #question-text { font-size: 22px; font-weight: bold; min-height: 50px; }
+        #answer-buttons button { margin: 5px; }
+
+        /* 答錯時的晃動動畫 */
+        @keyframes shake-wrong { 10%, 90% { transform: translateX(-3px); } 20%, 80% { transform: translateX(3px); } 30%, 50%, 70% { transform: translateX(-5px); } 40%, 60% { transform: translateX(5px); } }
+        .shake-wrong { animation: shake-wrong 0.5s; }
+
+    </style>
+</head>
+<body>
+    <div class="content-box">
+        <h1>歡迎來到色彩峽谷！</h1>
+        
+        <div class="canyon-drawing">
+            <div class="canyon-part" id="sun">Sun</div>
+            <div class="canyon-part" id="river">River</div>
+            <div class="canyon-part" id="tree">Tree</div>
+        </div>
+
+        <!-- 互動核心區域 -->
+        <div id="quiz-area">
+            <p id="question-text">一個問題會出現在這裡...</p>
+            <div id="answer-buttons">
+                <!-- 選項按鈕會由 JavaScript 動態生成 -->
+            </div>
+        </div>
+
+        <button id="complete-btn" class="wood-button" style="background-color: #4CAF50; margin-top:20px;" disabled>完成峽谷探索</button>
+        <button id="reset-stream-progress-btn" class="wood-button" style="background-color: #c76a5a; margin: 30px 10px 0 10px;">重置本章進度</button>
+        <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7; margin-top: 20px;">返回主題地圖</a>
+        <a href="index.html" class="wood-button" style="background-color: #d4e87d; margin-top: 20px;">返回魔法學校大門</a>
+    </div>
+    </div>
+
+    <script>
+        // === 1. 準備我們的「題庫」和「元素」 ===
+        const questions = [
+            {
+                partId: 'sun',
+                question: "什麼詞語可以形容太陽？ (Which word describes the sun?)",
+                options: ["bright", "heavy", "sad"],
+                correctAnswer: "bright"
+            },
+            {
+                partId: 'river',
+                question: "什麼詞語可以形容河流？ (Which word describes the river?)",
+                options: ["tall", "deep", "soft"],
+                correctAnswer: "deep"
+            },
+            {
+                partId: 'tree',
+                question: "什麼詞語可以形容大樹？ (Which word describes the tree?)",
+                options: ["quick", "loud", "huge"],
+                correctAnswer: "huge"
+            }
+        ];
+        
+        let currentQuestionIndex = 0;
+
+        const questionText = document.getElementById('question-text');
+        const answerButtonsContainer = document.getElementById('answer-buttons');
+        const completeBtn = document.getElementById('complete-btn');
+
+        // === 2. 顯示問題的函數 ===
+        function displayQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                // 所有題目都答完了
+                questionText.textContent = "太棒了！你為峽谷帶來了所有色彩！";
+                answerButtonsContainer.innerHTML = ""; // 清空按鈕
+                completeBtn.disabled = false; // 啟用完成按鈕
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionText.textContent = currentQuestion.question;
+            answerButtonsContainer.innerHTML = ""; // 清空上一題的按鈕
+
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('wood-button');
+                button.onclick = function() { checkAnswer(option, currentQuestion); };
+                answerButtonsContainer.appendChild(button);
+            });
+        }
+
+        // === 3. 檢查答案的函數 ===
+        function checkAnswer(selectedOption, question) {
+            const partElement = document.getElementById(question.partId);
+            
+            if (selectedOption === question.correctAnswer) {
+                // 答對了！
+                partElement.classList.add('colored');
+                partElement.textContent = `${question.partId} is ${question.correctAnswer}!`;
+                
+                // 進入下一題
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                // 答錯了！
+                answerButtonsContainer.childNodes.forEach(btn => {
+                    if (btn.textContent === selectedOption) {
+                        btn.classList.add('shake-wrong');
+                        // 移除動畫class，以便下次還能觸發
+                        setTimeout(() => { btn.classList.remove('shake-wrong'); }, 500);
+                    }
+                });
+            }
+        }
+
+        // === 4. 開始遊戲 ===
+        displayQuestion(); // 頁面載入後，顯示第一題
+
+        // === 5. 完成按鈕的邏輯 ===
+        completeBtn.addEventListener('click', function() {
+            localStorage.setItem('canyonCompleted', 'true');
+            alert("恭喜！你讓世界變得更多彩！迴音洞穴在等待著你！");
+            this.disabled = true;
+        });
+    </script>
+</body>
+</html>

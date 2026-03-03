@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主選單</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="content-box">
+        <h1 id="welcome-title">年級大廳</h1>
+        <p>Please choose your mision！</p>
+        
+        <div class="level-select-map">
+            <a href="forest.html" class="map-region region-forest" id="forest-gate"><span class="region-name">單字森林</span></a>
+            <a href="#" class="map-region region-stream locked" id="stream-gate"><span class="region-name">句子溪流</span><span class="lock-icon">🔒</span></a>
+            <a href="#" class="map-region region-hill locked" id="hill-gate"><span class="region-name">故事山丘</span><span class="lock-icon">🔒</span></a>
+            <a href="#" class="map-region region-summit locked" id="summit-gate"><span class="region-name">時光之巔</span><span class="lock-icon">🔒</span></a>
+            <a href="#" class="map-region region-maze locked" id="maze-gate"><span class="region-name">方位迷宮</span><span class="lock-icon">🔒</span></a>
+            <a href="#" class="map-region region-canyon locked" id="canyon-gate"><span class="region-name">色彩峽谷</span><span class="lock-icon">🔒</span></a>
+            <a href="#" class="map-region region-grotto locked" id="grotto-gate"><span class="region-name">迴音洞穴</span><span class="lock-icon">🔒</span></a>
+        </div>
+        
+        <!-- 👇👇👇 確保「返回」和「重置」按鈕都在這裡 👇👇👇 -->
+        <a href="index.html" id="main-menu-back-btn" class="wood-button" style="background-color: #d4e87d; margin-top: 20px;">返回魔法學校大門</a>
+        <a href="profile.html" class="wood-button" style="position: absolute; bottom: 25px; right: 25px; background-color: #4CAF50;">我的成長記錄 🌳</a>
+        <button id="reset-progress-btn" class="wood-button" style="position: absolute; bottom: 25px; right: 25px; background-color: #c76a5a;">重置進度 🔄</button>
+        
+    </div>
+
+    <script>
+        // --- 歡迎標題 ---
+        const currentGrade = localStorage.getItem('selectedGrade') || '1';
+        document.getElementById('welcome-title').textContent = `Welcome，P.${currentGrade} adventurers！`;
+
+        // --- 重置進度 ---
+        document.getElementById('reset-progress-btn').addEventListener('click', function() {
+            if (confirm("你確定要重置所有【遊戲進度】嗎？")) {
+                localStorage.removeItem('forestCompleted');
+                localStorage.removeItem('streamCompleted');
+                localStorage.removeItem('hillCompleted');
+                // ... (其他 removeItem) ...
+                alert("遊戲進度已重置！");
+                window.location.reload();
+            }
+        });
+
+        // --- 線性解鎖 ---
+        function unlockRegion(gate, url) {
+            if (gate && gate.classList.contains('locked')) {
+                gate.classList.remove('locked');
+                const lockIcon = gate.querySelector('.lock-icon');
+                if(lockIcon) lockIcon.remove();
+                gate.href = url;
+            }
+        }
+        if (localStorage.getItem('forestCompleted') === 'true') { unlockRegion(document.getElementById('stream-gate'), 'stream.html'); }
+        if (localStorage.getItem('streamCompleted') === 'true') { unlockRegion(document.getElementById('hill-gate'), 'hill.html'); }
+        if (localStorage.getItem('hillCompleted') === 'true') { unlockRegion(document.getElementById('summit-gate'), 'summit.html'); }
+        if (localStorage.getItem('summitCompleted') === 'true') { unlockRegion(document.getElementById('maze-gate'), 'maze.html'); }
+        if (localStorage.getItem('mazeCompleted') === 'true') { unlockRegion(document.getElementById('canyon-gate'), 'canyon.html'); }
+        if (localStorage.getItem('canyonCompleted') === 'true') { unlockRegion(document.getElementById('grotto-gate'), 'grotto.html'); }
+        // ... (其他解鎖邏輯) ...
+    </script>
+</body>
+</html>

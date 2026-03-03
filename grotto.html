@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>迴音洞穴</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="map-container">
+        <h1>歡迎來到迴音洞穴！</h1>
+        <p>對著洞穴說句話，看看它會如何「回響」你？</p>
+
+        <div style="margin: 20px 0;">
+            <input type="text" id="user-input" placeholder="在這裡輸入一句英文..." style="padding: 10px; font-size: 16px; width: 60%;">
+            <button class="wood-button" id="speak-btn">說話</button>
+        </div>
+        
+        <div id="echo-area" style="margin: 20px; padding: 20px; background: #333; color: #0f0; border-radius: 5px; min-height: 50px; font-family: monospace;">
+            洞穴深處一片寂靜...
+        </div>
+
+        <button id="complete-btn" class="wood-button" style="background-color: #4CAF50;" disabled>完成洞穴探索</button>
+        <button id="reset-stream-progress-btn" class="wood-button" style="background-color: #c76a5a; margin: 30px 10px 0 10px;">重置本章進度</button>
+        <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7; margin-top: 20px;">返回主題地圖</a>
+        <a href="index.html" class="wood-button" style="background-color: #d4e87d; margin-top: 20px;">返回魔法學校大門</a>
+    </div>
+    <script>
+        const userInput = document.getElementById('user-input');
+        const speakBtn = document.getElementById('speak-btn');
+        const echoArea = document.getElementById('echo-area');
+        const completeBtn = document.getElementById('complete-btn');
+
+        speakBtn.addEventListener('click', function() {
+            const text = userInput.value;
+            if (text.trim() === '') {
+                echoArea.textContent = "洞穴抱怨道：『你什麼都沒說！』";
+                return;
+            }
+            
+            // 簡單的回響邏輯
+            echoArea.textContent = `洞穴輕聲回響著：『...${text.toLowerCase()}...』`;
+            
+            userInput.value = ''; // 清空輸入框
+            completeBtn.disabled = false; // 只要說過話，就可以完成
+        });
+
+        completeBtn.addEventListener('click', function() {
+            localStorage.setItem('grottoCompleted', 'true');
+            alert("恭喜！你已掌握了溝通的初步！你已完成所有挑戰！");
+            this.disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的鑽石成長樹</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- 這個頁面專屬的樣式 --- */
+        #progress-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #5a3a22;
+        }
+        .tree-container {
+            width: 90%;
+            max-width: 400px; /* 稍微加寬一點 */
+            height: 550px; /* 加高以容納更多鑽石 */
+            margin: 0 auto;
+            border: 5px solid #65320d;
+            background: linear-gradient(to bottom, #a1c4fd, #c2e9fb); /* 天空背景 */
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        #growth-tree {
+            width: 100%;
+            height: 100%;
+        }
+        #trunk {
+            transition: all 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* 更有彈性的生長動畫 */
+        }
+        /* 【核心】鑽石的樣式 */
+        .diamond {
+            opacity: 0.15; /* 讓未解鎖的插槽更暗淡 */
+            filter: grayscale(100%) drop-shadow(1px 1px 1px rgba(0,0,0,0.5)); /* 灰色並帶有陰影 */
+            transition: all 0.8s ease-in-out;
+            cursor: pointer;
+            stroke: rgba(0,0,0,0.3); /* 給鑽石一個描邊 */
+            stroke-width: 0.5;
+        }
+        .diamond.unlocked {
+            opacity: 1;
+            filter: grayscale(0%) drop-shadow(2px 2px 5px rgba(0,0,0,0.5)); /* 解鎖後，陰影更明顯 */
+            animation: diamond-appear 1s cubic-bezier(0.34, 1.56, 0.64, 1); /* 更有彈性的出現動畫 */
+        }
+        .diamond:hover {
+            transform-origin: center center;
+            transform: scale(1.8); /* 滑鼠懸停時，放大更多，方便查看 */
+            stroke-width: 0;
+        }
+        @keyframes diamond-appear {
+            0% { transform: scale(0.3) rotate(-270deg); opacity: 0; }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-box">
+        <h1>我的鑽石成長樹</h1>
+        <p id="progress-text">計算寶石收集中...</p>
+        <div class="tree-container">
+            <svg id="growth-tree" viewBox="0 0 100 150">
+                <!-- 樹幹 (初始很矮) -->
+                <rect id="trunk" x="45" y="140" width="10" height="10" rx="2" fill="#8B4513" />
+                
+                <!-- 預先定義好所有「鑽石插槽」的位置和對應的記錄 -->
+                <!-- P.1 鑽石 -->
+                <path class="diamond region-forest" id="forest_p1_completed" d="M35,120 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p1_completed" d="M55,130 l7,-12 l7,12 l-7,12 Z" />
+                
+                <!-- P.2 鑽石 -->
+                <path class="diamond region-forest" id="forest_p2_completed" d="M65,110 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p2_completed" d="M30,100 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-hill"   id="hill_p2_completed"   d="M48,105 l10,-10 l10,10 l-10,10 Z" />
+
+                <!-- P.3 鑽石 -->
+                <path class="diamond region-forest" id="forest_p3_completed" d="M50,85 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p3_completed" d="M70,90 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-hill"   id="hill_p3_completed"   d="M25,80 l10,-10 l10,10 l-10,10 Z" />
+                <path class="diamond region-summit" id="summit_p3_completed" d="M45,70 l10,-15 l10,15 l-10,15 Z" />
+
+                <!-- P.4 鑽石 -->
+                <path class="diamond region-forest" id="forest_p4_completed" d="M35,60 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p4_completed" d="M65,50 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-hill"   id="hill_p4_completed"   d="M50,55 l10,-10 l10,10 l-10,10 Z" />
+                <path class="diamond region-summit" id="summit_p4_completed" d="M30,40 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-maze"   id="maze_p4_completed"   d="M70,35 l10,-10 l10,10 l-10,10 Z" />
+
+                <!-- P.5 鑽石 -->
+                <path class="diamond region-forest" id="forest_p5_completed" d="M50,25 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p5_completed" d="M25,20 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-hill"   id="hill_p5_completed"   d="M75,15 l10,-10 l10,10 l-10,10 Z" />
+
+                <!-- P.6 鑽石 -->
+                <path class="diamond region-forest" id="forest_p6_completed" d="M60,5 l10,-15 l10,15 l-10,15 Z" />
+                <path class="diamond region-stream" id="stream_p6_completed" d="M40,2 l7,-12 l7,12 l-7,12 Z" />
+                <path class="diamond region-hill"   id="hill_p6_completed"   d="M20,5 l10,-10 l10,10 l-10,10 Z" />
+            </svg>
+        </div>
+        <a href="main_menu.html" class="wood-button" style="background-color: #5a94c7;">返回主題地圖</a>
+    </div>
+
+    <script>
+        // 1. 定義我們所有可能的鑽石 (通關記錄)
+        const allDiamonds = [
+            'forest_p1_completed', 'stream_p1_completed', 'hill_p1_completed', 'summit_p1_completed', 'maze_p1_completed', 'canyon_p1_completed', 'grotto_p1_completed',
+            'forest_p2_completed', 'stream_p2_completed', 'hill_p2_completed', 'summit_p2_completed', 'maze_p2_completed', 'canyon_p2_completed', 'grotto_p2_completed',
+            'forest_p3_completed', 'stream_p3_completed', 'hill_p3_completed', 'summit_p3_completed', 'maze_p3_completed', 'canyon_p3_completed', 'grotto_p3_completed',
+            'forest_p4_completed', 'stream_p4_completed', 'hill_p4_completed', 'summit_p4_completed', 'maze_p4_completed', 'canyon_p4_completed', 'grotto_p4_completed',
+            'forest_p5_completed', 'stream_p5_completed', 'hill_p5_completed', 'summit_p5_completed', 'maze_p5_completed', 'canyon_p5_completed', 'grotto_p5_completed',
+            'forest_p6_completed', 'stream_p6_completed', 'hill_p6_completed', 'summit_p6_completed', 'maze_p6_completed', 'canyon_p6_completed', 'grotto_p6_completed',
+        ];
+        
+        let unlockedCount = 0;
+
+        // 2. 遍歷所有鑽石，檢查 localStorage 並「點亮」它們
+        allDiamonds.forEach(diamondKey => {
+            const diamondElement = document.getElementById(diamondKey);
+            if (diamondElement && localStorage.getItem(diamondKey) === 'true') {
+                unlockedCount++;
+                setTimeout(() => {
+                    diamondElement.classList.add('unlocked');
+                }, 300 * Math.random());
+            }
+        });
+
+        // 3. 更新進度文字
+        document.getElementById('progress-text').textContent = `你已收集 ${unlockedCount} / ${allDiamonds.length} 顆魔法鑽石！`;
+
+        // 4. 更新樹幹高度
+        const trunk = document.getElementById('trunk');
+        if (unlockedCount > 0) {
+            const growthPerDiamond = 2; // 每顆鑽石讓樹長高2單位
+            const newHeight = 10 + (unlockedCount * growthPerDiamond);
+            const newY = 140 - (unlockedCount * growthPerDiamond);
+            trunk.setAttribute('height', newHeight);
+            trunk.setAttribute('y', newY);
+        }
+    </script>
+</body>
+</html>

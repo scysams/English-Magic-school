@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic English Learning Platform - choose your level</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="content-box">
+        <h1>Welcome to Magic English Learning School</h1>
+        <p>Hello, adventurers! Please choose your level and start your adventures.</p>
+        
+        <div class="level-select-map">
+            <!-- 【關鍵】確保 a 標籤內部，有 class="grade-text" 的 span -->
+            <a href="main_menu.html?grade=1" class="level-gate grade-1" id="grade-1-gate">
+                <img src="badge_p1.png" class="grade-icon-image" alt="一年級徽章">
+                <span class="grade-text"><br>P.1</span>
+            </a>
+             <a href="main_menu.html?grade=2" class="level-gate grade-2" id="grade-2-gate">
+                <img src="badge_p2.png" class="grade-icon-image" alt="二年級徽章">
+                <span class="grade-text"><br>P.2</span>
+            </a>
+            <a href="main_menu.html?grade=3" class="level-gate grade-3" id="grade-3-gate">
+                <img src="badge_p3.png" class="grade-icon-image" alt="三年級徽章">
+                <span class="grade-text"><br>P.3</span>
+            </a>
+            <a href="main_menu.html?grade=4" class="level-gate grade-4" id="grade-4-gate">
+                <img src="badge_p4.png" class="grade-icon-image" alt="四年級徽章">
+                <span class="grade-text"><br>P.4</span>
+            </a>
+            <a href="main_menu.html?grade=5" class="level-gate grade-5" id="grade-5-gate">
+                <img src="badge_p5.png" class="grade-icon-image" alt="五年級徽章">
+                <span class="grade-text"><br>P.5</span>
+            </a>
+            <a href="main_menu.html?grade=6" class="level-gate grade-6" id="grade-6-gate">
+                <img src="badge_p6.png" class="grade-icon-image" alt="六年級徽章">
+                <span class="grade-text"><br>P.6</span>
+            </a>
+        </div>
+    </div>
+        
+        <!-- 我們將「重置」按鈕，作為一個獨立的管理工具，放在這裡 -->
+        <button id="reset-all-btn" class="wood-button" style="background-color:#c76a5a; margin-top: 30px;">清除所有記錄 (管理員)</button>
+    </div>
+
+    <script>
+        // --- 為年級按鈕設定 localStorage ---
+        document.querySelectorAll('.level-gate').forEach(gate => {
+            gate.addEventListener('click', function(event) {
+                event.preventDefault(); // 先阻止跳轉
+                const grade = new URLSearchParams(this.href.split('?')[1]).get('grade');
+                if (grade) {
+                    localStorage.setItem('selectedGrade', grade);
+                    console.log(`年級已設定為: ${grade}`);
+                    window.location.href = this.href; // 手動跳轉
+                }
+            });
+        });
+
+        // --- 為「重置」按鈕，設定獨立的、清晰的清除功能 ---
+        document.getElementById('reset-all-btn').addEventListener('click', function() {
+            if (confirm("【管理員操作】\n你確定要徹底清除瀏覽器中所有的遊戲記錄嗎？")) {
+                localStorage.clear();
+                alert("所有記錄已清除！");
+            }
+        });
+    </script>
+</body>
+</html>
