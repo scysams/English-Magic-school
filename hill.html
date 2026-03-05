@@ -93,11 +93,11 @@
         // === 3. 題庫 ===
         const gradeContent = {
             1: {
-                title: "P.1 - 看圖說故事",
-                description: "請將圖片，按照故事發生的順序，拖曳到上方的 1, 2, 3 框格裡。",
+                title: "P.1 - Picture Description",
+                description: "Please drag the picture by order into the box of 1,2,3.",
                 setup: function() {
                     const key = 'hill_p1_completed';
-                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>Good job！</h2>"; return; }
                     
                     exerciseArea.innerHTML = `
                         <div id="p1-story-board">
@@ -106,7 +106,7 @@
                             <div class="story-slot" data-order="3">3</div>
                         </div>
                         <div id="p1-image-bank"></div>
-                        <button id="check-btn" class="wood-button" style="margin-top: 20px;">檢查順序</button>
+                        <button id="check-btn" class="wood-button" style="margin-top: 20px;">Check</button>
                     `;
 
                     const images = [ { src: 'wakeup.png', order: 1 }, { src: 'eat.png', order: 2 }, { src: 'gotoschool.png', order: 3 } ];
@@ -206,9 +206,9 @@
     }
 },
         3: {
-    title: "P.3 - 時間線索 (Multiple Choice)",
-    description: "請閱讀段落，然後回答關於順序的問題。",
-    setup: function() {
+            title: "P.3 - Time Clue (Multiple Choice)",
+            description: "Please read the paragraph and answer the question.。",
+            setup: function() {
         const key = 'hill_p3_completed';
         if (localStorage.getItem(key) === 'true') { /*...*/ return; }
         
@@ -230,7 +230,7 @@
 
         function display() {
             if (idx >= stories.length) {
-                alert("邏輯滿分！P.3 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+                alert("Great！P.3 practice finish！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
             }
             const s = stories[idx];
             exerciseArea.innerHTML = `
@@ -257,8 +257,8 @@
     }
 },
         4: {
-    title: "P.4 - 小偵探 (是非題)",
-    description: "請閱讀下面的小故事，然後判斷句子的對錯。",
+    title: "P.4 - Detectives (True or False)",
+    description: "Please read the story and see if the sentence is true or false.",
     setup: function() {
         const key = 'hill_p4_completed';
         if (localStorage.getItem(key) === 'true') { /*...*/ return; }
@@ -281,8 +281,8 @@
     }
 },
 5: {
-    title: "P.5 - 故事問答 (選擇題)",
-    description: "請閱讀故事，然後回答問題。",
+    title: "P.5 - Story",
+    description: "Please reading the story and answer the question.",
     setup: function() {
         const key = 'hill_p5_completed';
         if (localStorage.getItem(key) === 'true') { /*...*/ return; }
@@ -308,8 +308,8 @@
     }
 },
 6: {
-    title: "P.6 - 尋找核心 (找出主題句)",
-    description: "請點擊最能概括本段大意的句子。",
+    title: "P.6 - Find the main idea",
+    description: "Please click the main idea of the paragraph.",
     setup: function() {
         const key = 'hill_p6_completed';
         if (localStorage.getItem(key) === 'true') { /*...*/ return; }
