@@ -163,11 +163,11 @@
                 }
             },
             2: {
-    title: "P.2 - 時鐘偵探 (True or False)",
-    description: "請觀察圖片和時間，判斷句子是否正確。",
-    setup: function() {
+            title: "P.2 - Time Detective (True or False)",
+            description: "Please look at the picture and time and see if the sentence is true or false.",
+            setup: function() {
         const key = 'hill_p2_completed';
-        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>Good job! You are finished！</h2>"; return; }
 
         const questions = [
             { time: "9:00 AM", scene: "上課 🧑‍🏫", statement: "At 9:00 AM, the students are sleeping.", answer: false },
@@ -178,7 +178,7 @@
 
         function display() {
             if (idx >= questions.length) {
-                alert("太棒了！P.2 練習完成！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+                alert("Great！P.2 practice is done！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
             }
             const q = questions[idx];
             exerciseArea.innerHTML = `
