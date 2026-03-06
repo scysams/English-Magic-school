@@ -197,7 +197,6 @@ p { color: #4a4a4a; font-size: 18px; }
 .menu-item:hover img { transform: scale(1.1); border-color: #8B4513; }
 /* --- 返回按鈕的「路牌」樣式 --- */
 #main-menu-back-btn {
-    position: absolute;
     bottom: 25px;
     left: 25px;
     
@@ -210,7 +209,6 @@ p { color: #4a4a4a; font-size: 18px; }
 /* --- 為「成長記錄」按鈕也加上，確保萬無一失 --- */
 /* 雖然它是內聯樣式，但在 style.css 裡加一條更保險 */
 a[href="profile.html"] {
-    position: absolute;
     bottom: 25px;
     right: 25px;
 
@@ -338,4 +336,20 @@ a[href="profile.html"] {
     0%   { filter: grayscale(0%) drop-shadow(2px 2px 5px rgba(0,0,0,0.5)); }
     50%  { filter: grayscale(0%) drop-shadow(2px 2px 15px rgba(255,255,200,0.8)); } /* 中間點，光暈變大變亮 */
     100% { filter: grayscale(0%) drop-shadow(2px 2px 5px rgba(0,0,0,0.5)); }
+}
+/* --- 底部按鈕指揮部的樣式 --- */
+.bottom-button-bar {
+    position: absolute; /* 【權力】只有指揮部需要絕對定位 */
+    bottom: 25px;
+    left: 25px;
+    right: 25px;
+
+    display: flex; /* 【核心】使用 Flexbox 來管理內部按鈕 */
+    justify-content: space-between; /* 將左右兩組按鈕，推到容器的兩端 */
+    align-items: center; /* 垂直居中 */
+}
+
+/* 確保「返回路牌」不再是絕對定位 */
+.back-to-menu-btn {
+    position: static; /* 恢復正常的文檔流定位 */
 }
