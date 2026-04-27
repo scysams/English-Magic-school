@@ -65,6 +65,20 @@
 .story-paragraph { text-align: left; background: white; padding: 20px; border-radius: 5px; font-size: 22px; line-height: 1.7; margin: 20px 0; }
 .tf-buttons, .mc-options { margin-top: 20px; }
 
+#p6-paragraph {
+    text-align: left;
+    font-size: 22px; /* 稍微再大一點 */
+    line-height: 2;
+    
+    /* 👇👇👇 【核心】更換字體 👇👇👇 */
+    font-family: "Georgia", "Times New Roman", serif;
+    
+    background: white; /* 給段落一個白色背景 */
+    padding: 25px;     /* 增加內邊距 */
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
     </style>
 </head>
 <body>
@@ -96,68 +110,55 @@
                 title: "P.1 - Picture Description",
                 description: "Please drag the picture by order into the box of 1,2,3.",
                 setup: function() {
-                    const key = 'hill_p1_completed';
-                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>Good job！</h2>"; return; }
-                    
-                    exerciseArea.innerHTML = `
-                        <div id="p1-story-board">
-                            <div class="story-slot" data-order="1">1</div>
-                            <div class="story-slot" data-order="2">2</div>
-                            <div class="story-slot" data-order="3">3</div>
-                        </div>
-                        <div id="p1-image-bank"></div>
-                        <button id="check-btn" class="wood-button" style="margin-top: 20px;">Check</button>
-                    `;
+        const key = 'hill_p1_completed';
+        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+        
+        exerciseArea.innerHTML = `
+            <div id="p1-story-board">
+                <div class="story-slot" data-order="1">1</div>
+                <div class="story-slot" data-order="2">2</div>
+                <div class="story-slot" data-order="3">3</div>
+            </div>
+            <div id="p1-image-bank"></div>
+            <button id="check-btn" class="wood-button" style="margin-top: 20px;">檢查順序</button>
+        `;
 
-                    const images = [ { src: 'wakeup.png', order: 1 }, { src: 'eat.png', order: 2 }, { src: 'gotoschool.png', order: 3 } ];
-                    const imageBank = document.getElementById('p1-image-bank');
-                    images.sort(() => Math.random() - 0.5).forEach(imgData => {
-                        const img = document.createElement('img');
-                        img.src = imgData.src; img.className = 'story-image-card'; img.draggable = true;
-                        img.dataset.order = imgData.order;
-                        imageBank.appendChild(img);
-                    });
+        const images = [ { src: 'wakeup.png', order: 1 }, { src: 'eat.png', order: 2 }, { src: 'gotoschool.png', order: 3 } ];
+        const imageBank = document.getElementById('p1-image-bank');
+        images.sort(() => Math.random() - 0.5).forEach(imgData => {
+            const img = document.createElement('img');
+            img.src = imgData.src; img.className = 'story-image-card'; img.draggable = true;
+            img.dataset.order = imgData.order;
+            imageBank.appendChild(img);
+        });
 
-                    let draggedItem = null;
-                    document.querySelectorAll('.story-image-card, .story-slot').forEach(item => {
-                        item.addEventListener('dragstart', (e) => {
-                            // 如果是從格子里拖出來，就記住它
-                            if (e.target.classList.contains('story-image-card')) {
-                                draggedItem = e.target;
-                            }
-                        });
-                    });
+        let draggedItem = null;
+        document.querySelectorAll('.story-image-card, .story-slot').forEach(item => {
+            item.addEventListener('dragstart', (e) => { if (e.target.classList.contains('story-image-card')) { draggedItem = e.target; } });
+        });
+        document.querySelectorAll('.story-slot').forEach(slot => {
+            slot.addEventListener('dragover', e => e.preventDefault());
+            slot.addEventListener('dragenter', () => slot.classList.add('drag-over'));
+            slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault(); slot.classList.remove('drag-over');
+                if (draggedItem) {
+                    if (slot.children.length > 0) { imageBank.appendChild(slot.children[0]); }
+                    slot.appendChild(draggedItem);
+                    draggedItem = null;
+                }
+            });
+        });
 
-                    document.querySelectorAll('.story-slot').forEach(slot => {
-                        slot.addEventListener('dragover', e => e.preventDefault());
-                        slot.addEventListener('dragenter', () => slot.classList.add('drag-over'));
-                        slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
-                        slot.addEventListener('drop', (e) => {
-                            e.preventDefault();
-                            slot.classList.remove('drag-over');
-                            if (draggedItem) {
-                                // 如果格子裡已有圖片，把它跟拖曳的圖片交換位置
-                                if (slot.children.length > 0) {
-                                    const existingCard = slot.children[0];
-                                    draggedItem.parentElement.appendChild(existingCard);
-                                }
-                                slot.appendChild(draggedItem);
-                                draggedItem = null;
-                            }
-                        });
-                    });
-
-                    document.getElementById('check-btn').onclick = () => {
-                        const slots = document.querySelectorAll('.story-slot');
-                        const isCorrect = Array.from(slots).every((slot, index) => {
-                            return slot.children.length === 1 && slot.children[0].dataset.order == (index + 1);
-                        });
-                        if (isCorrect) {
-                            alert('順序完全正確！你太棒了！');
-                            localStorage.setItem(key, 'true');
-                            checkGraduation();
-                        } else {
-                            alert('順序好像不太對哦，再想想看！');
+        document.getElementById('check-btn').onclick = () => {
+            const slots = document.querySelectorAll('.story-slot');
+            const isCorrect = Array.from(slots).every((slot, index) => {
+                return slot.children.length === 1 && slot.children[0].dataset.order == (index + 1);
+            });
+            if (isCorrect) {
+                alert('順序完全正確！你太棒了！'); localStorage.setItem(key, 'true'); checkGraduation();
+            } else {
+                alert('順序好像不太對哦，再想想看！');
                         }
                     };
                 }
@@ -167,18 +168,94 @@
             description: "Please look at the picture and time and see if the sentence is true or false.",
             setup: function() {
         const key = 'hill_p2_completed';
-        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>Good job! You are finished！</h2>"; return; }
+        if (localStorage.getItem(key) === 'true') {
+            exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>";
+            checkGraduation(); return;
+        }
+
+        // a. P.2 的「選擇題」題庫
+        const questions = [
+            {
+                question: "What do students usually do at 9:00 AM on a weekday?",
+                options: ["They are having lessons.", "They are sleeping.", "They are eating dinner."],
+                answer: "They are having lessons."
+            },
+            {
+                question: "What do people usually do at 1:00 PM?",
+                options: ["They are brushing teeth.", "They are having lunch.", "They are watching stars."],
+                answer: "They are having lunch."
+            },
+            {
+                question: "What do you usually do at 10:00 PM at night?",
+                options: ["Go to school.", "Play in the park.", "Go to bed."],
+                answer: "Go to bed."
+            }
+        ];
+        let idx = 0;
+
+        // b. 顯示問題的函數
+        function display() {
+            if (idx >= questions.length) {
+                alert("太棒了！你對時間的安排瞭如指掌！");
+                localStorage.setItem(key, 'true');
+                checkGraduation();
+                return;
+            }
+            const q = questions[idx];
+            
+            // 創建HTML結構
+            exerciseArea.innerHTML = `
+                <h3 style="font-size: 28px;">${q.question}</h3>
+                <div class="mc-options" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;"></div>
+            `;
+            
+            const optionsContainer = document.querySelector('.mc-options');
+            
+            // 隨機顯示選項
+            q.options.sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'wood-button';
+                btn.textContent = opt;
+                btn.style.width = '350px'; // 讓按鈕寬一點，方便長句子
+                btn.onclick = () => {
+                    if (opt === q.answer) {
+                        // 答對了，進入下一題
+                        idx++;
+                        display();
+                    } else {
+                        // 答錯了，晃動
+                        btn.classList.add('shake-wrong');
+                        setTimeout(() => btn.classList.remove('shake-wrong'), 500);
+                    }
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // c. 開始遊戲
+        display();
+    }
+},
+        3: {
+            title: "P.3 - Time Clue (Multiple Choice)",
+            description: "Please read the paragraph and answer the question.。",
+            setup: function() {
+        const key = 'hill_p3_completed'; // KEY 更新為 P.3
+        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
 
         const questions = [
-            { time: "9:00 AM", scene: "Having Lesson 🧑‍🏫", statement: "At 9:00 AM, the students are sleeping.", answer: false },
-            { time: "12:30 PM", scene: "lunch 🍱", statement: "At 12:30 PM, the students are having lunch.", answer: true },
-            { time: "8:00 PM", scene: "doing homework ✍️", statement: "At 8:00 PM, the students are playing in the park.", answer: false }
+            { time: "9:00 AM", scene: "上課 🧑‍🏫", statement: "At 9:00 AM, the students are having lunch.", answer: false },
+            { time: "12:30 PM", scene: "午飯 🍱", statement: "At 12:30 PM, the students are having lunch.", answer: true },
+            { time: "8:00 PM", scene: "做功課 ✍️", statement: "At 8:00 PM, the students are playing in the park.", answer: false }
         ];
         let idx = 0;
 
         function display() {
             if (idx >= questions.length) {
-                alert("Great！P.2 practice is done！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+                alert("太棒了！P.3 練習完成！"); // 提示訊息更新
+                localStorage.setItem(key, 'true');
+                checkGraduation();
+                return;
             }
             const q = questions[idx];
             exerciseArea.innerHTML = `
@@ -205,79 +282,48 @@
         display();
     }
 },
-        3: {
-            title: "P.3 - Time Clue (Multiple Choice)",
-            description: "Please read the paragraph and answer the question.。",
-            setup: function() {
-        const key = 'hill_p3_completed';
-        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
-        
-        const stories = [
-            {
-                paragraph: "To make a sandwich, **first**, you take two slices of bread. **Then**, you put some cheese on one slice. **Finally**, you put the other slice on top.",
-                question: "Which action happened first?",
-                options: ["Put cheese", "Take bread", "Put slices on top"],
-                answer: "Take bread"
-            },
-            {
-                paragraph: "Yesterday was a busy day. **First**, I went to the library. **After that**, I played football with my friends. **In the evening**, I did my homework.",
-                question: "What did I do after going to the library?",
-                options: ["Did homework", "Ate dinner", "Played football"],
-                answer: "Played football"
-            }
-        ];
-        let idx = 0;
-
-        function display() {
-            if (idx >= stories.length) {
-                alert("Great！P.3 practice finish！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
-            }
-            const s = stories[idx];
-            exerciseArea.innerHTML = `
-                <div class="story-paragraph">${s.paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
-                <h3 style="margin-top: 30px;">${s.question}</h3>
-                <div class="mc-options"></div>
-            `;
-            const optionsContainer = document.querySelector('.mc-options');
-            s.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'wood-button'; btn.textContent = opt;
-                btn.onclick = () => {
-                    if (opt === s.answer) {
-                        idx++; display();
-                    } else {
-                        btn.classList.add('shake-wrong');
-                        setTimeout(() => btn.classList.remove('shake-wrong'), 500);
-                    }
-                };
-                optionsContainer.appendChild(btn);
-            });
-        }
-        display();
-    }
-},
         4: {
     title: "P.4 - Detectives (True or False)",
-    description: "Please read the story and see if the sentence is true or false.",
+    description: "Please read the story and check if the sentence is true or false.",
     setup: function() {
         const key = 'hill_p4_completed';
-        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
-        exerciseArea.innerHTML = `
-            <div style="text-align: left; background: white; padding: 15px; border-radius: 5px;">
-                <p>Little Red Riding Hood went to visit her grandma. On her way, she met a big wolf. The wolf ran to grandma's house first.</p>
-            </div>
-            <h3 style="margin-top: 30px;">判斷句子： "Little Red Riding Hood met a cat."</h3>
-            <div style="margin-top: 20px;">
-                <button id="true-btn" class="wood-button" style="background-color: green;">True ✔️</button>
-                <button id="false-btn" class="wood-button" style="background-color: red;">False ❌</button>
-            </div>
-        `;
-        document.getElementById('true-btn').onclick = () => alert("不對哦，她遇到的是大灰狼！");
-        document.getElementById('false-btn').onclick = () => {
-            alert("完全正確！她沒有遇到貓！");
-            localStorage.setItem(key, 'true');
-            checkGraduation();
-        };
+        if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
+
+        const cases = [
+    { story: "Little Red Riding Hood went to visit her grandma. On her way, she met a big wolf.", statement: "Little Red Riding Hood met a cat.", answer: false },
+    { story: "Cinderella went to the ball in a beautiful blue dress. She danced with the prince but had to leave before midnight.", statement: "Cinderella wore a red dress to the ball.", answer: false },
+    { story: "The three little pigs built their houses. The first pig built a house of straw. The third built a strong house of bricks.", statement: "The third pig's house was the strongest.", answer: true },
+    { story: "Goldilocks found a house in the forest. She ate a bowl of porridge that was too hot.", statement: "Goldilocks ate porridge that was just right.", answer: false },
+    { story: "Pinocchio was a wooden puppet. His nose grew longer every time he told a lie.", statement: "Pinocchio's nose grew shorter when he lied.", answer: false }
+];
+        let idx = 0;
+
+        function displayCase() {
+            if (idx >= cases.length) {
+                alert("太棒了！所有案件都已偵破！"); localStorage.setItem(key, 'true'); checkGraduation(); return;
+            }
+            const c = cases[idx];
+            exerciseArea.innerHTML = `
+                <div class="story-paragraph">${c.story}</div>
+                <h3 style="margin-top: 30px;">判斷句子： "${c.statement}"</h3>
+                <div class="tf-buttons">
+                    <button id="true-btn" class="wood-button" style="background-color: #4CAF50;">True ✔️</button>
+                    <button id="false-btn" class="wood-button" style="background-color: #f44336;">False ❌</button>
+                </div>
+            `;
+            document.getElementById('true-btn').onclick = () => checkAnswer(true);
+            document.getElementById('false-btn').onclick = () => checkAnswer(false);
+        }
+
+        function checkAnswer(userAnswer) {
+            const c = cases[idx];
+            if (userAnswer === c.answer) {
+                idx++; displayCase();
+            } else {
+                alert("判斷錯誤！再仔細看看案情陳述！");
+            }
+        }
+        displayCase();
     }
 },
 5: {
@@ -347,35 +393,88 @@
     }
 },
 6: {
-    title: "P.6 - Find the main idea",
-    description: "Please click the main idea of the paragraph.",
+    title: "P.6 - Main Idea",
+    description: "Please click the main idea of the paragraph",
     setup: function() {
         const key = 'hill_p6_completed';
-        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
-        exerciseArea.innerHTML = `
-            <div id="p6-paragraph" style="text-align: left; font-size: 20px; line-height: 1.8;">
-                <span class="sentence" data-correct="false">My dog is very playful.</span>
-                <span class="sentence" data-correct="true">Dogs are wonderful pets for many reasons.</span>
-                <span class="sentence" data-correct="false">They are loyal and always happy to see you.</span>
-                <span class="sentence" data-correct="false">You should take your dog for a walk every day.</span>
-            </div>
-        `;
-        document.querySelectorAll('.sentence').forEach(s => {
-            s.style.cursor = 'pointer';
-            s.onmouseover = () => { s.style.backgroundColor = '#FFD700'; };
-            s.onmouseout = () => { s.style.backgroundColor = 'transparent'; };
-            s.onclick = () => {
-                if (s.dataset.correct === 'true') {
-                    alert("完全正確！這就是主題句！");
-                    localStorage.setItem(key, 'true');
-                    checkGraduation();
-                } else {
-                    alert("不對哦，這只是一個細節或例子。");
-                    s.classList.add('shake-wrong');
-                    setTimeout(() => s.classList.remove('shake-wrong'), 500);
-                }
-            };
-        });
+        if (localStorage.getItem(key) === 'true') {
+            exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>";
+            checkGraduation(); return;
+        }
+
+        // a. 【核心】先創建HTML，再獲取元素！
+        exerciseArea.innerHTML = `<div id="p6-paragraph" style="text-align: left; font-size: 20px; line-height: 2;"></div>`;
+        const paragraphContainer = document.getElementById('p6-paragraph');
+
+        // b. 題庫
+        const paragraphs = [
+    // 1. Dogs
+    { sentences: [ { text: "My dog is very playful.", isMainIdea: false }, { text: "Dogs are wonderful pets for many reasons.", isMainIdea: true }, { text: "They are loyal and always happy to see you.", isMainIdea: false }, { text: "You should take your dog for a walk every day.", isMainIdea: false } ] },
+    // 2. Sun
+    { sentences: [ { text: "The sun provides heat and light.", isMainIdea: false }, { text: "Plants use sunlight to make food.", isMainIdea: false }, { text: "The sun is very important to our planet.", isMainIdea: true }, { text: "Without the sun, the Earth would be a frozen ball of ice.", isMainIdea: false } ] },
+    // 3. Trees
+    { sentences: [ { text: "Trees give us oxygen to breathe.", isMainIdea: false }, { text: "Many animals live in trees.", isMainIdea: false }, { text: "We get wood and paper from trees.", isMainIdea: false }, { text: "Trees are essential for life on Earth.", isMainIdea: true } ] },
+    // 4. Water
+    { sentences: [ { text: "All living things need water to survive.", isMainIdea: true }, { text: "You should drink about eight glasses of water a day.", isMainIdea: false }, { text: "Farmers use water to grow crops.", isMainIdea: false }, { text: "Water is also used for cleaning and cooking.", isMainIdea: false } ] },
+    // 5. Exercise
+    { sentences: [ { text: "Running is a good form of exercise.", isMainIdea: false }, { text: "Regular exercise is crucial for maintaining good health.", isMainIdea: true }, { text: "It helps to keep your heart strong.", isMainIdea: false }, { text: "It can also improve your mood.", isMainIdea: false } ] },
+    // 6. Reading
+    { sentences: [ { text: "Reading books can be a very enjoyable hobby.", isMainIdea: false }, { text: "It allows you to travel to new worlds without leaving your chair.", isMainIdea: false }, { text: "Reading is a fundamental skill that improves your mind.", isMainIdea: true }, { text: "You can learn new vocabulary and ideas from reading.", isMainIdea: false } ] },
+    // 7. Healthy Food
+    { sentences: [ { text: "Apples and bananas are healthy snacks.", isMainIdea: false }, { text: "Eating a balanced diet is key to staying healthy.", isMainIdea: true }, { text: "You should eat plenty of fruits and vegetables.", isMainIdea: false }, { text: "Sugary drinks are not good for your teeth.", isMainIdea: false } ] },
+    // 8. Sleep
+    { sentences: [ { text: "Getting enough sleep is vital for your body and brain.", isMainIdea: true }, { text: "Most children need about 9 to 11 hours of sleep each night.", isMainIdea: false }, { text: "A good night's sleep helps you concentrate in school.", isMainIdea: false }, { text: "It also helps your body to grow and repair itself.", isMainIdea: false } ] },
+    // 9. Friendship
+    { sentences: [ { text: "Good friends listen to each other's problems.", isMainIdea: false }, { text: "They enjoy spending time together.", isMainIdea: false }, { text: "Having good friends is an important part of a happy life.", isMainIdea: true }, { text: "Friends can support you when you are feeling down.", isMainIdea: false } ] },
+    // 10. Recycling
+    { sentences: [ { text: "You can recycle paper, plastic, and glass.", isMainIdea: false }, { text: "Recycling helps to protect the environment in several ways.", isMainIdea: true }, { text: "It saves energy and natural resources.", isMainIdea: false }, { text: "It also reduces the amount of waste in landfills.", isMainIdea: false } ] }
+].sort(() => Math.random() - 0.5); // 【加分項】隨機打亂段落的出現順序！
+        let currentParaIndex = 0;
+
+        // c. 顯示段落的函數
+        function displayParagraph() {
+            if (currentParaIndex >= paragraphs.length) {
+                exerciseArea.innerHTML = "<h2>太棒了！你擁有卓越的閱讀分析能力！</h2>";
+                localStorage.setItem(key, 'true');
+                checkGraduation();
+                return;
+            }
+
+            const currentPara = paragraphs[currentParaIndex];
+            paragraphContainer.innerHTML = ""; // 清空上一題的句子
+            
+            currentPara.sentences.forEach(s => {
+                const sentenceSpan = document.createElement('span');
+                sentenceSpan.className = 'sentence';
+                sentenceSpan.textContent = s.text + " ";
+                sentenceSpan.dataset.isMainIdea = s.isMainIdea;
+                
+                sentenceSpan.onclick = () => checkAnswer(sentenceSpan); // 綁定點擊事件
+                
+                paragraphContainer.appendChild(sentenceSpan);
+            });
+        }
+
+        // d. 檢查答案的函數
+        function checkAnswer(selectedSpan) {
+            if (selectedSpan.dataset.isMainIdea === 'true') {
+                selectedSpan.classList.add('correct-selected');
+                document.querySelectorAll('.sentence').forEach(s => { s.onclick = null; s.style.cursor = 'default'; }); // 答對後，禁用所有點擊
+
+                setTimeout(() => {
+                    alert("完全正確！這就是本段的核心！");
+                    currentParaIndex++;
+                    displayParagraph();
+                }, 1500);
+            } else {
+                selectedSpan.classList.add('shake-wrong');
+                setTimeout(() => selectedSpan.classList.remove('shake-wrong'), 500);
+                alert("不對哦，這只是一個細節或例子。");
+            }
+        }
+
+        // e. 開始遊戲
+        displayParagraph();
     }
 }
         }
