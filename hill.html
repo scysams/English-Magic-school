@@ -281,30 +281,69 @@
     }
 },
 5: {
-    title: "P.5 - Story",
-    description: "Please reading the story and answer the question.",
+    title: "P.5 - Conjunctions Master",
+    description: "Choose the correct word to complete the sentence.",
     setup: function() {
-        const key = 'hill_p5_completed';
-        if (localStorage.getItem(key) === 'true') { /*...*/ return; }
-        exerciseArea.innerHTML = `
-            <div style="text-align: left; background: white; padding: 15px; border-radius: 5px;">
-                <p>Tom is a student. Every morning, he goes to school by bus. After school, he likes to play football in the park with his friends.</p>
-            </div>
-            <h3 style="margin-top: 30px;">Question: Where does Tom like to play football?</h3>
-            <div id="p5-options" style="margin-top: 20px;"></div>
-        `;
-        const options = ["In the school", "In the park", "At home"];
-        const correctAnswer = "In the park";
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'wood-button'; btn.textContent = opt;
-            btn.onclick = () => {
-                if (opt === correctAnswer) {
-                    alert("回答正確！"); localStorage.setItem(key, 'true'); checkGraduation();
-                } else { btn.classList.add('shake-wrong'); setTimeout(() => btn.classList.remove('shake-wrong'), 500); }
-            };
-            document.getElementById('p5-options').appendChild(btn);
-        });
+        const key = 'forest_p5_completed'; // 使用 forest_p5_completed 以保持一致
+        if (localStorage.getItem(key) === 'true') {
+            exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>";
+            checkGraduation(); // 確保頁面加載時也檢查畢業狀態
+            return;
+        }
+
+        // 題庫：10題關於 Although, because, so, but
+        const questions = [
+            { sentence: "I wanted to play outside, ___ it started to rain.", options: ["but", "so", "because"], answer: "but" },
+            { sentence: "She was very tired, ___ she went to bed early.", options: ["although", "so", "but"], answer: "so" },
+            { sentence: "He wore a thick coat ___ it was a cold day.", options: ["because", "so", "although"], answer: "because" },
+            { sentence: "___ he studied hard, he did not pass the test.", options: ["Although", "Because", "So"], answer: "Although" },
+            { sentence: "The book was long, ___ I enjoyed reading it.", options: ["but", "so", "because"], answer: "but" },
+            { sentence: "They can't go to the zoo ___ it is closed today.", options: ["because", "although", "so"], answer: "because" },
+            { sentence: "My sister likes apples, ___ she doesn't like pears.", options: ["so", "but", "although"], answer: "but" },
+            { sentence: "It was snowing heavily, ___ the school was closed.", options: ["so", "because", "but"], answer: "so" },
+            { sentence: "___ the dress was expensive, she decided to buy it.", options: ["Because", "So", "Although"], answer: "Although" },
+            { sentence: "He got a good grade on the exam ___ he worked hard every day.", options: ["although", "because", "so"], answer: "because" }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        function displayQuestion() {
+            // 如果完成所有題目
+            if (currentQuestionIndex >= questions.length) {
+                alert("Excellent! You've mastered these conjunctions!");
+                localStorage.setItem(key, 'true');
+                checkGraduation(); // 完成後，立刻檢查畢業資格
+                exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; // 顯示完成訊息
+                return;
+            }
+
+            const q = questions[currentQuestionIndex];
+            // 顯示題目和選項
+            exerciseArea.innerHTML = `<div class="story-paragraph" style="font-size: 24px; font-weight: bold; margin-bottom: 30px;">${q.sentence}</div><div class="mc-options"></div>`;
+            const optionsContainer = document.querySelector('.mc-options');
+            
+            // 隨機排列選項
+            q.options.sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'wood-button';
+                btn.textContent = opt;
+
+                btn.onclick = () => {
+                    // 檢查答案
+                    if (opt === q.answer) {
+                        currentQuestionIndex++; // 如果正確，進入下一題
+                        displayQuestion();
+                    } else {
+                        // 如果錯誤，按鈕晃動提示
+                        btn.classList.add('shake-wrong');
+                        setTimeout(() => btn.classList.remove('shake-wrong'), 500);
+                    }
+                };
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        displayQuestion(); // 啟動第一題
     }
 },
 6: {
