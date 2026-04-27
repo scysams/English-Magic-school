@@ -1,3 +1,5 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
 /* === 創世之書 (Final Golden Master CSS) === */
 
 /* --- 基礎樣式 --- */
@@ -8,7 +10,7 @@ body {
     margin: 0; padding: 20px 0;
     /* background-color: #fdf6e3; */ /* 註解掉舊的純色背景 */
     background-image: url('https://www.transparenttextures.com/patterns/old-paper.png'); /* 使用紋理圖片 */
-    font-family: 'MedievalSharp', cursive; /* 讓所有頁面的預設字體都更有魔法感 */
+    font-family: 'Nunito', sans-serif; /* 讓所有頁面的預設字體都更有魔法感 */
 }
 h1 {
     font-family: 'MedievalSharp', cursive; font-size: 48px;
