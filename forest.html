@@ -405,24 +405,120 @@
     }
 },
             5: {
-                title: "P.5 - 反義詞配對 (Antonyms)", description: "請將意思相反的詞語配對！",
-                setup: function() {
-                    const key = 'forest_p5_completed';
-                    if (localStorage.getItem(key) === 'true') { exerciseArea.innerHTML = "<h2>你已完成此練習！</h2>"; return; }
-                    exerciseArea.innerHTML = `<div id="p4-match-area"><div class="match-column" id="col-left"></div><div class="match-column" id="col-right"></div></div>`;
-                    const pairs = { 'hot': 'cold', 'light': 'dark', 'up': 'down', 'in': 'out', 'on': 'off' };
-                    const leftWords = Object.keys(pairs);
-                    const rightWords = Object.values(pairs).sort(() => Math.random() - 0.5);
-                    const leftCol = document.getElementById('col-left');
-                    const rightCol = document.getElementById('col-right');
-                    leftWords.forEach(word => { leftCol.innerHTML += `<div class="match-card" data-word="${word}">${word}</div>`; });
-                    rightWords.forEach(word => { rightCol.innerHTML += `<div class="match-card" data-word="${word}">${word}</div>`; });
-                    let selectedLeft = null, selectedRight = null, matchedCount = 0, totalPairs = leftWords.length;
-                    function checkMatch() { if (!selectedLeft || !selectedRight) return; if (pairs[selectedLeft.dataset.word] === selectedRight.dataset.word) { selectedLeft.classList.add('matched'); selectedRight.classList.add('matched'); matchedCount++; if (matchedCount === totalPairs) { setTimeout(() => { alert('配對成功！'); localStorage.setItem(key, 'true'); checkGraduation(); }, 500); } } else { const tempLeft = selectedLeft, tempRight = selectedRight; tempLeft.classList.add('shake-wrong'); tempRight.classList.add('shake-wrong'); setTimeout(() => { tempLeft.classList.remove('selected', 'shake-wrong'); tempRight.classList.remove('selected', 'shake-wrong'); }, 500); } selectedLeft = null; selectedRight = null; }
-                    leftCol.addEventListener('click', e => { if (e.target.classList.contains('match-card') && !e.target.classList.contains('matched')) { if (selectedLeft) selectedLeft.classList.remove('selected'); selectedLeft = e.target; selectedLeft.classList.add('selected'); checkMatch(); } });
-                    rightCol.addEventListener('click', e => { if (e.target.classList.contains('match-card') && !e.target.classList.contains('matched')) { if (selectedRight) selectedRight.classList.remove('selected'); selectedRight = e.target; selectedRight.classList.add('selected'); checkMatch(); } });
+    title: "P.5 - Antonym Matching",
+    description: "Please match the words with opposite meanings!",
+    setup: function() {
+        const key = 'forest_p5_completed';
+        if (localStorage.getItem(key) === 'true') {
+            exerciseArea.innerHTML = "<h2>You have completed this exercise!</h2>";
+            return;
+        }
+
+        // Setup the HTML structure for the matching game
+        exerciseArea.innerHTML = `<div id="p4-match-area"><div class="match-column" id="col-left"></div><div class="match-column" id="col-right"></div></div>`;
+
+        // 👇👇👇 【核心】擴充後的反義詞題庫 👇👇👇
+        const antonymPairs = {
+            // Original Pairs
+            'hot': 'cold',
+            'light': 'dark',
+            'up': 'down',
+            'in': 'out',
+            'on': 'off',
+            'happy': 'sad',
+            'big': 'small',
+            
+            // New Pairs Added
+            'fast': 'slow',
+            'day': 'night',
+            'open': 'close',
+            'empty': 'full',
+            'wet': 'dry',
+            'loud': 'quiet',
+            'long': 'short',
+            'easy': 'hard'
+        };
+
+        // Get the HTML elements for the columns
+        const leftColumn = document.getElementById('col-left');
+        const rightColumn = document.getElementById('col-right');
+        
+        // Prepare and shuffle words
+        const leftWords = Object.keys(antonymPairs);
+        const rightWords = Object.values(antonymPairs).sort(() => Math.random() - 0.5); // Shuffle the right column
+
+        // Populate the columns with word cards
+        leftWords.forEach(word => {
+            leftColumn.innerHTML += `<div class="match-card" data-word="${word}">${word}</div>`;
+        });
+        rightWords.forEach(word => {
+            rightColumn.innerHTML += `<div class="match-card" data-word="${word}">${word}</div>`;
+        });
+
+        // Game state variables
+        let selectedLeftCard = null;
+        let selectedRightCard = null;
+        let matchedCount = 0;
+        const totalPairs = leftWords.length;
+
+        // Function to check if the selected cards match
+        function checkMatch() {
+            if (!selectedLeftCard || !selectedRightCard) return;
+
+            // Check if the right card is the correct antonym for the left card
+            if (antonymPairs[selectedLeftCard.dataset.word] === selectedRightCard.dataset.word) {
+                // If they match, apply 'matched' style and increment count
+                selectedLeftCard.classList.add('matched');
+                selectedRightCard.classList.add('matched');
+                matchedCount++;
+
+                if (matchedCount === totalPairs) {
+                    setTimeout(() => {
+                        alert('Excellent! All pairs matched!');
+                        localStorage.setItem(key, 'true');
+                        checkGraduation();
+                    }, 500);
                 }
-            },
+            } else {
+                // If they don't match, shake them and deselect
+                const tempLeft = selectedLeftCard;
+                const tempRight = selectedRightCard;
+                tempLeft.classList.add('shake-wrong');
+                tempRight.classList.add('shake-wrong');
+                setTimeout(() => {
+                    tempLeft.classList.remove('selected', 'shake-wrong');
+                    tempRight.classList.remove('selected', 'shake-wrong');
+                }, 500);
+            }
+            // Reset selection after checking
+            selectedLeftCard = null;
+            selectedRightCard = null;
+        }
+
+        // Event listener for the left column
+        leftColumn.addEventListener('click', e => {
+            const clickedCard = e.target;
+            if (clickedCard.classList.contains('match-card') && !clickedCard.classList.contains('matched')) {
+                if (selectedLeftCard) selectedLeftCard.classList.remove('selected');
+                selectedLeftCard = clickedCard;
+                selectedLeftCard.classList.add('selected');
+                checkMatch();
+            }
+        });
+
+        // Event listener for the right column
+        rightColumn.addEventListener('click', e => {
+            const clickedCard = e.target;
+            if (clickedCard.classList.contains('match-card') && !clickedCard.classList.contains('matched')) {
+                if (selectedRightCard) selectedRightCard.classList.remove('selected');
+                selectedRightCard = clickedCard;
+                selectedRightCard.classList.add('selected');
+                checkMatch();
+            }
+        });
+    }
+},
+
             6: {
                 title: "P.6 - 瀕危動物檔案館", description: "請閱讀檔案，找出正確的動物！",
                 setup: function() {
